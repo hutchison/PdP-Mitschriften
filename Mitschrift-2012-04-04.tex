@@ -1,0 +1,258 @@
+\documentclass[%
+a4paper, %apaper,   % alle weiteren Papierformat einstellbar
+%empty,             % keine Seitenzahlen
+9pt,               % Schriftgröße (12pt, 11pt (Standard))
+leqno,              % Nummerierung von Gleichungen links
+fleqn,              % Ausgabe von Gleichungen linksbündig
+%smallheadings,
+%abstracton,
+]
+{scrartcl}
+
+%% Deutsche Anpassungen
+\usepackage[ngerman]{babel}
+
+\usepackage{xltxtra, fontspec, xunicode}
+
+\newcommand{\headerfont}{Gill Sans Std}
+
+% TODO: Die Schrift auf eine ändern, die man auch auf dem System findet.
+%\setmainfont[Mapping=tex-text]{Palatino LT Std}
+\setmainfont[Mapping=tex-text]{Minion Pro}
+\setkomafont{sectioning}{\fontspec{\headerfont}}
+\setkomafont{title}{\fontspec{\headerfont}}
+%\linespread{1.05}
+
+%obligatorischer Mathekram:
+\usepackage{amssymb,amstext}
+%\usepackage{stmaryrd}
+\usepackage[sumlimits]{amsmath}
+\usepackage{eulervm}
+%\usepackage{mnsymbol}
+
+%nützliche Extras:
+\usepackage{array,
+  %hhline,
+  %tabularx,
+  %enumerate,
+  %color,
+  %setspace,
+  %booktabs,
+  %cite,
+  %caption,
+  %lineno,
+  %lastpage,
+  %algorithm,
+  %algorithmic,
+  listings,
+  %bussproofs,
+  %ulem,
+  %multirow,
+  %natbib,
+  %url,
+}
+%\usepackage{ltxtable}
+\usepackage[xetex, colorlinks=false, pdfnewwindow=true]{hyperref}
+
+\usepackage[
+  cm,
+  headings
+]{fullpage}
+%\usepackage[left=1cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot]{geometry}
+
+\lstset{
+  language=bash,
+  basicstyle=\fontspec{\codefont},
+  showstringspaces=false,
+  keywordstyle=\color{blue}\bfseries,
+}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+% Veranstaltung:
+\fancyhead[L]{\fontspec{\headerfont}Paradigmen der Programmierung}
+\fancyhead[C]{}
+\fancyhead[R]{\fontspec{\headerfont}4. April 2012}
+
+% \fancyfoot[L]{}
+\fancyfoot[C]{\thepage}
+% \fancyfoot[R]{\thepage / \pageref{LastPage}}
+
+%% Linie oben/unten
+\renewcommand{\headrulewidth}{0.0pt}
+%\renewcommand{\footnoterule}{}
+
+\parindent 0pt
+
+%% Pakete für Grafiken & Abbildungen
+%\usepackage{graphicx}
+%\usepackage{tikz}      %%TeX ist kein Zeichenprogramm
+%\usetikzlibrary{calc,arrows}
+
+%% Lochmarken; auskommentieren, falls unerwünscht
+%\usepackage{eso-pic}
+%\AddToShipoutPicture*{
+%    \put(0,68.5mm){\rule{15pt}{0.5pt}}
+%    \put(0,0.5\paperheight){\rule{20pt}{0.5pt}}
+%    \put(0,228.5mm){\rule{15pt}{0.5pt}}
+%}
+
+%\usepackage{pdflscape}
+
+\newcommand{\codefont}{Inconsolata}
+%\newcommand{\codefont}{Bitstream Vera Sans Mono}
+\newcommand{\code}[1]{{\fontspec[Mapping=tex-text]{\codefont}#1}}
+\newcommand{\tinycode}[1]{{\fontspec[Mapping=tex-text]{\codefont}\tiny#1}}
+
+\begin{document}
+
+\section*{Organisatorisches}
+\begin{itemize}
+\item Übungsleiter: Albert Hein
+\item Modulprüfung: Klausur:
+  \begin{itemize}
+    \item 31. Juli 2012, 9-11 Uhr
+    \item KZ-Haus (A.-E.-Str. 22), HS037
+    \item Zulassungsbedingung: 75\% der Übungsaufgaben
+  \end{itemize}
+\item Note = 100\% der Klausur
+\item bezüglich der Übungen:
+  \begin{itemize}
+    \item Ort: Raum 219, Sun-Pool
+    \item Start: ab dem 16. April
+    \item wichtig: Accounts klar Schiff machen!
+    \item Termine:
+      \begin{itemize}
+        \item immer in den geraden Wochen
+        \item erster Termin: 17.4. bzw. 20.4.
+        \item dienstags 15:15 - 16:45 Uhr
+        \item freitags 9:00 - 10:30 Uhr
+      \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\section*{Shells \& Tools}
+\begin{itemize}
+\item zum Warmwerden ein Beispiel mit vielen Zahlen
+\item Programm \code{summary}, das spaltenweise Mittelwerte und
+  Standardabweichung berechnet
+\item ergibt $793 \cdot 2 = 1586$ Zahlen
+\item Quizfrage: wie wird die Eingabedatei \code{numbers.dat} mit \code{summary}
+  verarbeitet?
+  \begin{itemize}
+    \item Lösung 1: massive manpower
+    \item Lösung 2: mit dem Computer: \code{\$ summary < numbers.dat}
+  \end{itemize}
+\item Was tun bei Kommentarzeilen?
+  \begin{itemize}
+    \item erste Kommentarzeile rausfiltern (z.\,B. mit \code{head}: \code{\$
+      head -1 < numbers.dat | summary})
+    \item Datenfluss: \code{numbers.dat} $\rightarrow$ \code{head} $\rightarrow$
+      \code{summary}
+    \item im schlimmsten Fall werden alle Daten erst komplett durch \code{head}
+      gejagt und dann nochmal durch \code{summary}
+  \end{itemize}
+\item Wir wollen aber, dass jede Zeile nur ein einziges Mal gelesen wird! Was
+  tun?
+  \begin{lstlisting}
+#!/bin/bash
+read
+exec summary
+  \end{lstlisting}
+  siehe auch: \url{http://man.cx/read}, \url{http://man.cx/exec}
+\item Aufruf: \code{\$ butfirst.sh < numbers.dat}
+\end{itemize}
+
+\section*{Fallstudie I: DZNE - Sensor based monitoring}
+\begin{itemize}
+\item Worum geht's?
+  \begin{itemize}
+    \item „neurodegenerative Erkrankungen“ werden gerade in der westlichen Welt
+      zum großen Problem
+    \item Kriegen wir eine Sensortechnik hin, die Früherkennung leistet?
+  \end{itemize}
+\item bei der Verarbeitung veranstaltet man ganz viel Datenfoo
+\item Bezug zur Vorlesung: Datenstromverarbeitung mit AWK
+\item Problem: Daten werden meist in voller Gänze in den Speicher geladen und
+  Dinge\texttrademark\ werden sehr schnell sehr langsam
+\item für die Prozesssteuerung wurden Shell Skripte eingesetzt
+\end{itemize}
+
+\section*{Prozesspipelines \& Glue Languages}
+\begin{itemize}
+\item Unix - Wiederholung/Designphilosophie
+  \begin{itemize}
+  \item Demotime:
+    \begin{lstlisting}
+$ ls -l
+$ echo 'Hello Welt'
+    \end{lstlisting}
+    siehe auch: \href{http://de.wikipedia.org/wiki/Ls_(Unix)}{WP: ls (Unix)},
+    \href{http://de.wikipedia.org/wiki/Echo_(Informatik)}{WP: echo (Informatik)}
+  \item Kurzeinführung: was ist ein Betriebssystem? (siehe auch:
+    \href{https://de.wikipedia.org/wiki/Betriebssystem}{WP: Betriebssysteme})
+  \item Was ist ein Prozess?
+    \begin{itemize}
+      \item Programm in der Ausführung
+      \item aus Sicht des OS: Eintrag in der Prozesstabelle
+      \item siehe auch:
+        \href{http://de.wikipedia.org/wiki/Prozess_(Informatik)}{WP: Prozess
+        (Informatik)}
+    \end{itemize}
+  \item monolithisches OS vs. Microkernel
+    \begin{itemize}
+      \item siehe auch:
+        \href{https://de.wikipedia.org/wiki/Monolithischer_Kernel}{WP:
+        Monolithischer Kernel},
+        \href{https://de.wikipedia.org/wiki/Microkernel}{WP: Microkernel}
+    \end{itemize}
+  \item Demotime:
+    \begin{lstlisting}
+$ ls -l
+$ tr [:lower:] [:upper:]
+$ ls -l | tr [:lower:] [:upper:]
+    \end{lstlisting}
+    siehe auch: \href{http://en.wikipedia.org/wiki/Tr_(Unix)}{eWP: tr (Unix)}
+  \item (fast) alles ist eine Datei
+    \begin{itemize}
+      \item Zugriff mittels File-Deskriptor
+      \item siehe auch: \href{https://de.wikipedia.org/wiki/Datei-Handle}{WP:
+        Datei-Handle}, 
+        \href{https://de.wikipedia.org/wiki/Standard-Datenströme}{WP:
+        Standard-Datenströme}
+    \end{itemize}
+  \item Demotime:
+    \begin{lstlisting}
+$ tr [:lower:] [:upper:] < testargs.sh
+    \end{lstlisting}
+  \end{itemize}
+\item Hierarchisches Dateisystem: keine weitere Erwähnung
+\item Kernel und Prozesse (Fork, Exec, File-Deskriptoren)
+  \begin{itemize}
+    \item Ist die Shell was besonderes?
+    \item[$\Rightarrow$] Nein! Sie ist ein ganz normaler Prozess.
+    \item wird später genauer drauf eingegangen
+  \end{itemize}
+\end{itemize}
+
+\section*{Beispiel 2: „Tischrechner“}
+\begin{itemize}
+\item Was tut das Beispielskript?
+  \begin{itemize}
+    \item in der while-Schleife wird ein Ausdruck eingegeben
+    \item Hilfsfunktion \code{calculate} löscht ein paar Dateien
+    \item schreibt in die Datei \code{mycalc.c} ein C-Programm, das den Ausdruck
+      berechnet
+    \item dieses C-Programm wird kompiliert und ausgeführt
+  \end{itemize}
+\end{itemize}
+
+\section*{Beispiel 3: ein sehr einfacher Webserver}
+\begin{itemize}
+  \item eine Schleife, die mittels \code{nc} einen vordefinierten Text liefert
+  \item siehe auch: \href{http://de.wikipedia.org/wiki/Netcat}{WP: netcat}
+\end{itemize}
+
+\end{document}
